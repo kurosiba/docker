@@ -1,0 +1,11 @@
+version: '3'
+services:
+  mysql:
+    image: mysql 
+
+    volumes:
+      - ./mysql/db:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_ROOT_PASSWORD=root 
+      
+  #api: 
