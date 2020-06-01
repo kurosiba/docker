@@ -8,4 +8,8 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=root 
       
-  #api: 
+   api:
+    build:
+     context: ./
+     dockerfile: Dokerfile
+  

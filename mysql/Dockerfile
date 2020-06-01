@@ -2,8 +2,9 @@
 
 FROM golang:1.14-alpine
 
-EXPOSE 3306
+EXPOSE 8080
 
-WORKDIR /mysql/github.com/kurosiba/golang-docker.git
+
+#WORKDIR /mysql/github.com/kurosiba/golang-docker.git
 
 #CMD[""]
