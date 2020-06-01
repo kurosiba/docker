@@ -1,7 +1,7 @@
 package main
 
-import "ftm"
+import "fmt"
 
 func main(){
-	ftm.Printf("Hello World\n")
+	fmt.Printf("Hello World\n")
 }
