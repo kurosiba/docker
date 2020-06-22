@@ -1,15 +1,15 @@
 version: '3'
 services:
-  mysql:
+  mysql_test:
     image: mysql 
-    #restart: always
-    
+    restart: always
+    #tty: true
     volumes:
       - ./mysql/db:/docker-entrypoint-initdb.d
     environment:
       - MYSQL_ROOT_PASSWORD=root 
       
-  api:
+  api_test:
     build:
      context: ./mysql
      dockerfile: Dockerfile
@@ -17,8 +17,10 @@ services:
     volumes:
      - ./src:/go/src
     
-    #restart: always
+    restart: always
     tty: true
     environment:
       - MYSQL_ROOT_PASSWORD=Root
+    ports:
+      - "8080:8080"
   
