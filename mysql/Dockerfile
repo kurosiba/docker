@@ -6,4 +6,9 @@ EXPOSE 8080
 
 WORKDIR ./src
 
-#CMD[""]
+#COPY . go.mod
+#COPY . go.sum 
+
+
+#CMD ["go", "run", "main.go"]
+
