@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
   "log"
+  "encoding/json"
   "database/sql"
    _ "github.com/go-sql-driver/mysql"
 
@@ -14,27 +15,52 @@ func HelloHandler(w http.ResponseWriter, r *http.Request){
 	fmt.Fprintf(w, "Hello, World")
 }
 
+func encoding(name string, token int) {
+
+  type PersonData struct{
+    Name string
+    Token int
+  }
+
+  data := PersonData{
+    Name: name,
+    Token: token,
+  }
+
+  j, err := json.Marshal(data)
+
+  if err != nil{
+    fmt.Println("error:", err)
+  }
+
+  log.Println(string(j))
+  
+}
+
 func GetHandler(w http.ResponseWriter, r *http.Request){
   
   db, err := sql.Open("mysql", "root:root@tcp(mysql_test:3306)/test_db")
 
   if err != nil {
-  panic(err)
-}
-defer db.Close()
+   panic(err)
+  }
 
-var (
-  name string
-  token int
-)
+  defer db.Close()
 
-if err := db.QueryRow("SELECT username,token FROM users WHERE token=?", 2).Scan(&name,&token);
+  var (
+    name string 
+    token int 
+  )
 
-err != nil {
-log.Fatal(err)
-}
+  if err := db.QueryRow("SELECT username,token FROM users WHERE token=?", 2).Scan(&name,&token);
 
-log.Println(name, token)
+  err != nil {
+   log.Fatal(err)
+  }
+
+  //log.Println(name, token)
+  
+  encoding(name, token)
   
 }
 
@@ -44,30 +70,41 @@ func AllGetHandler(w http.ResponseWriter, r *http.Request){
 
   if err != nil {
   panic(err)
-}
-defer db.Close()
+  }
 
-rows, err := db.Query("SELECT username, token FROM users")
-if err != nil{
+  defer db.Close()
+
+  rows, err := db.Query("SELECT username, token FROM users")
+
+  if err != nil{
   log.Fatal(err)
-}
-defer rows.Close()
+  }
 
-for rows.Next(){
-  var token int
-  var name string
+  defer rows.Close()
+
+  for rows.Next(){
+   
+   var (
+     token int
+     name string
+   )
 
   if err := rows.Scan(&name,&token);
+  
   err != nil{
     log.Fatal(err)
   }
-log.Println(name, token)
-}
 
-if err := rows.Err();
-err != nil{
-  log.Fatal(err)
-}
+  //log.Println(name, token)
+  encoding(name, token)
+
+  }
+
+  if err := rows.Err();
+
+  err != nil{
+   log.Fatal(err)
+  }
 
 }
 
