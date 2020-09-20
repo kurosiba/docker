@@ -15,7 +15,7 @@ func HelloHandler(w http.ResponseWriter, r *http.Request){
 	fmt.Fprintf(w, "Hello, World")
 }
 
-func encoding(name string, token int) {
+func encoding(w http.ResponseWriter, name string, token int) {
 
   type PersonData struct{
     Name string
@@ -34,7 +34,10 @@ func encoding(name string, token int) {
   }
 
   log.Println(string(j))
+  fmt.Fprint(w,string(j))
   
+  //return 
+
 }
 
 func GetHandler(w http.ResponseWriter, r *http.Request){
@@ -60,7 +63,7 @@ func GetHandler(w http.ResponseWriter, r *http.Request){
 
   //log.Println(name, token)
   
-  encoding(name, token)
+  encoding(w, name, token)
   
 }
 
@@ -96,7 +99,7 @@ func AllGetHandler(w http.ResponseWriter, r *http.Request){
   }
 
   //log.Println(name, token)
-  encoding(name, token)
+  encoding(w, name, token)
 
   }
 
