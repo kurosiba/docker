@@ -7,41 +7,23 @@ import (
   "log"
   "encoding/json"
   "database/sql"
-   _ "github.com/go-sql-driver/mysql"
-
+   _ "github.com/go-sql-driver/mysql"  
 )
 
 func HelloHandler(w http.ResponseWriter, r *http.Request){
 	fmt.Fprintf(w, "Hello, World")
 }
 
-func encoding(w http.ResponseWriter, name string, token int) {
+func GetHandler(w http.ResponseWriter, r *http.Request){
 
   type PersonData struct{
-    Name string
-    Token int
+    Name string `json:"name"`
+    Token int `json:"token"`
   }
-
-  data := PersonData{
-    Name: name,
-    Token: token,
-  }
-
-  j, err := json.Marshal(data)
-
-  if err != nil{
-    fmt.Println("error:", err)
-  }
-
-  log.Println(string(j))
-  fmt.Fprint(w,string(j))
   
-  //return 
+  var jsonData []PersonData
+  var personData PersonData
 
-}
-
-func GetHandler(w http.ResponseWriter, r *http.Request){
-  
   db, err := sql.Open("mysql", "root:root@tcp(mysql_test:3306)/test_db")
 
   if err != nil {
@@ -50,27 +32,36 @@ func GetHandler(w http.ResponseWriter, r *http.Request){
 
   defer db.Close()
 
-  var (
-    name string 
-    token int 
-  )
-
-  if err := db.QueryRow("SELECT username,token FROM users WHERE token=?", 2).Scan(&name,&token);
+  if err := db.QueryRow("SELECT username,token FROM users WHERE token=?", 2).Scan(&personData.Name,&personData.Token);
 
   err != nil {
    log.Fatal(err)
   }
 
-  //log.Println(name, token)
+  jsonData = append(jsonData, personData)
   
-  encoding(w, name, token)
-  
+  j, err := json.Marshal(jsonData)
+
+  if err != nil{
+    fmt.Println("error:", err)
+  }
+ 
+  log.Println(string(j))
+  fmt.Fprint(w,string(j)) 
 }
 
 func AllGetHandler(w http.ResponseWriter, r *http.Request){
+   
+  type PersonData struct{
+    Name string `json:"name"`
+    Token int `json:"token"`
+  }
+
+  var jsonData []PersonData
+  var personData PersonData
 
   db, err := sql.Open("mysql", "root:root@tcp(mysql_test:3306)/test_db")
-
+  
   if err != nil {
   panic(err)
   }
@@ -87,20 +78,19 @@ func AllGetHandler(w http.ResponseWriter, r *http.Request){
 
   for rows.Next(){
    
-   var (
-     token int
-     name string
-   )
-
-  if err := rows.Scan(&name,&token);
+    if err := rows.Scan(&personData.Name,&personData.Token);
   
-  err != nil{
-    log.Fatal(err)
+    err != nil{
+      log.Fatal(err)
+    }
+
+    jsonData = append(jsonData, personData)
   }
+  
+  j, err := json.Marshal(jsonData)
 
-  //log.Println(name, token)
-  encoding(w, name, token)
-
+  if err != nil{
+    fmt.Println("error:", err)
   }
 
   if err := rows.Err();
@@ -108,22 +98,19 @@ func AllGetHandler(w http.ResponseWriter, r *http.Request){
   err != nil{
    log.Fatal(err)
   }
-
+  
+  log.Println(string(j))
+  fmt.Fprint(w,string(j))
 }
 
 func main(){
   http.HandleFunc("/", HelloHandler)
   http.HandleFunc("/get", GetHandler)
-  http.HandleFunc("/getAll",AllGetHandler)
-  /*when enter "http://localhost:8080/get" url, it send GerRequest to server*/
-  //http.HandleFunc("/post", PostHandler)
-  //http.HandleFunc("/put", PutHandler)
-
+  http.HandleFunc("/getAll",AllGetHandler)  
   http.ListenAndServe(":8080", nil)
-  
-}
+ }
 
-
+          
 
 
 
